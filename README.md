@@ -4,3 +4,8 @@
 
 
 Just a small practice with python
+
+
+### Created By:
+
+Niko Nmaki
