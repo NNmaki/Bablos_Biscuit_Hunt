@@ -1,4 +1,4 @@
-# Project Title: Bablos Biscuit Hunt
+# Bablos Biscuit Hunt -game
 
 ## 1. Project Description:
 
