@@ -39,13 +39,13 @@ HEIGHT = 860
 TITLE = "Bablo's Biscuit Hunt"
 
 # set objects/actors and positions
-bg = Actor("background")
+bg = Actor("background2")
 bg.pos = (WIDTH // 2, HEIGHT // 2)
 
 dog = Actor("bablo_center")
 dog.midbottom = (WIDTH // 2, HEIGHT)
 
-biscuit = Actor("biscuit")
+biscuit = Actor("biscuit50")
 biscuit.x = randint(20, WIDTH - 20)
 biscuit.y = randint(20, HEIGHT - 20)
 
