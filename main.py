@@ -33,6 +33,11 @@ from random import randint
 
 velocity = 5
 biscuits = []
+biscuit_velocity = 5
+
+timer = 0
+score = 0
+lives = 5
 
 # set canvas size & title (pygame zero constants, not variables)
 WIDTH = 580
@@ -58,9 +63,16 @@ def draw():
     for biscuit in biscuits:
         biscuit.draw()
 
+    # draw heads up display:    
+    screen.draw.text(f"Score: {score}", topleft=(10, 10), fontsize=42)
+    screen.draw.text(f"Lives: {lives}", midtop=(WIDTH // 2, 10), fontsize=42)
+    screen.draw.text(f"Time: {timer}", topright=(WIDTH -10, 10), fontsize=42)
+
 
 # update function, which acts like game loop
 def update():
+    global score # set variable global to access it within function
+    global lives # set variable global to access it within function
     if keyboard.LEFT and dog.left > 0 :
         dog.x -= velocity
         dog.image = "bablo_left"
@@ -71,6 +83,16 @@ def update():
         dog.y -= velocity
     elif keyboard.DOWN and dog.bottom < HEIGHT:
         dog.y += velocity
+    for biscuit in biscuits:
+        biscuit.y += biscuit_velocity # make biscuits falling
+        if biscuit.top > HEIGHT: # if top of biscuit goes below the screen
+            biscuits.remove(biscuit) # remove it from list
+            lives -= 1
+
+        if dog.colliderect(biscuit): # if player "hits" biscuit
+            biscuits.remove(biscuit) # remove biscuit from list (and screen)
+            score += 1
+    
 
     
 # function which is called when key button released and sets forward facing image 
@@ -82,10 +104,14 @@ def on_key_up(key):
 def spawn_biscuit():
     biscuit = Actor("biscuit")
     biscuit.x = randint(20, WIDTH - 20)
-    biscuit.y = randint(20, HEIGHT - 20)
+    biscuit.y = -20
     biscuits.append(biscuit)
 
+def increment_timer():
+    global timer # set variable global to access it within function
+    timer += 1 
 
+clock.schedule_interval(increment_timer, 1.0)
 clock.schedule_interval(spawn_biscuit, 0.5)
 
 pgzrun.go() # executes "game loop"
