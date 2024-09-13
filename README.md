@@ -1,5 +1,9 @@
 
-[bablos_dog_hunt_cover2](https://github.com/user-attachments/assets/5d8da75d-55e6-4665-8e48-c7dd2287ec67)
+
+![bablos_dog_hunt_cover2](https://github.com/user-attachments/assets/155ae36e-1015-4d50-9abc-e35b4deda7af)
+
+
+
 
 
 # Bablos Biscuit Hunt! -game
