@@ -26,3 +26,65 @@
 # 17. Set start/restart
 # 18. Set music and sounds
 #
+
+import pgzrun # import pygame zero library
+from random import randint
+
+velocity = 5
+biscuits = []
+
+# set canvas size & title (pygame zero constants, not variables)
+WIDTH = 580
+HEIGHT = 860
+TITLE = "Bablo's Biscuit Hunt"
+
+# set objects/actors and positions
+bg = Actor("background")
+bg.pos = (WIDTH // 2, HEIGHT // 2)
+
+dog = Actor("bablo_center")
+dog.midbottom = (WIDTH // 2, HEIGHT)
+
+biscuit = Actor("biscuit")
+biscuit.x = randint(20, WIDTH - 20)
+biscuit.y = randint(20, HEIGHT - 20)
+
+# set draw function to draw objects
+def draw():
+    screen.clear()
+    bg.draw()
+    dog.draw()
+    for biscuit in biscuits:
+        biscuit.draw()
+
+
+# update function, which acts like game loop
+def update():
+    if keyboard.LEFT and dog.left > 0 :
+        dog.x -= velocity
+        dog.image = "bablo_left"
+    elif keyboard.RIGHT and dog.right < WIDTH:
+        dog.x += velocity
+        dog.image = "bablo_right"
+    if keyboard.UP and dog.top > 0:
+        dog.y -= velocity
+    elif keyboard.DOWN and dog.bottom < HEIGHT:
+        dog.y += velocity
+
+    
+# function which is called when key button released and sets forward facing image 
+def on_key_up(key):
+    if key == keys.LEFT or key == keys.RIGHT:
+        dog.image = "bablo_center"
+
+# define spawning function to spawn falling objects
+def spawn_biscuit():
+    biscuit = Actor("biscuit")
+    biscuit.x = randint(20, WIDTH - 20)
+    biscuit.y = randint(20, HEIGHT - 20)
+    biscuits.append(biscuit)
+
+
+clock.schedule_interval(spawn_biscuit, 0.5)
+
+pgzrun.go() # executes "game loop"
