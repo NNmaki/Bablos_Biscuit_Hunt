@@ -1,153 +1,176 @@
 #
 #
+#
 # Bablos Biscuit Hunt - Small practice with Python
 # By Niko Nmaki 2024
 #
 # Inspired By @bablo_thedog - https://www.instagram.com/bablo_thedog/
 #
 #
-# Building steps: (just note to myself)
-# 1. Import Libraries
-# 2. Pygame setup - define canvas size, title etc
-# 3. Define background and set position
-# 4. Define characters 
-# 5. Set coordinates to spawn moving character
-# 6. Draw actors and set draw() -function
-# 7. Define update() -function which acts like gameloop
-# 8. Map keyboard and set key-functions on update() -function
-# 9. Set characters moving speed with velocity -variable
-# 10. Set player character movement animation
-# 11. Define spawn-function for falling object
-# 12. Set schedule for object spawning
-# 13. Set parameters (velocity) for falling objects
-# 14. Add collecting feature with .colliderect() -method
-# 15. Make display to show game info and set timer and life counter and score
-# 16. Set game_over() -details
-# 17. Set start/restart
-# 18. Set music and sounds
-#
 #
 
-import pgzrun # import pygame zero library
+import pygame
+from pygame.locals import *
 from random import randint
 
-velocity = 5
+pygame.init()
+
+# Set variablers
+velocity = 17
 biscuits = []
-biscuit_velocity = 6
+biscuit_velocity = 18
 
 timer = 0
 score = 0
 lives = 5
 over = False
+FPS = 60
 
-# set canvas size & title (pygame zero constants, not variables)
+# Set canvas and screen
 WIDTH = 580
 HEIGHT = 860
 TITLE = "Bablo's Biscuit Hunt"
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption(TITLE)
 
-# set objects/actors and positions
-bg = Actor("background2")
-bg.pos = (WIDTH // 2, HEIGHT // 2)
+# Load images
+bg = pygame.image.load("images/background2.png")
+dog_images = {
+    "center": pygame.image.load("images/bablo_center.png"),
+    "left": pygame.image.load("images/bablo_left.png"),
+    "right": pygame.image.load("images/bablo_right.png")
+}
+dog = dog_images["center"]
+dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 
-dog = Actor("bablo_center")
-dog.midbottom = (WIDTH // 2, HEIGHT)
+biscuit_image = pygame.image.load("images/biscuit50.png")
 
-biscuit = Actor("biscuit50")
-biscuit.x = randint(20, WIDTH - 20)
-biscuit.y = randint(20, HEIGHT - 20)
+# Load sounds
+bark_sound = pygame.mixer.Sound("sounds/bark.wav")
+barktwice_sound = pygame.mixer.Sound("sounds/barktwice.wav")
+pygame.mixer.music.load("music/biscuithunt.mp3")
 
-# set draw function to draw objects
+# Set fonts
+font = pygame.font.SysFont(None, 42)
+font_game_over = pygame.font.SysFont(None, 100)
+
+# Set timers
+clock = pygame.time.Clock()
+biscuit_spawn_event = pygame.USEREVENT + 1
+timer_event = pygame.USEREVENT + 2
+restart_event = pygame.USEREVENT + 3 # New event for restarting game
+pygame.time.set_timer(biscuit_spawn_event, 500)
+pygame.time.set_timer(timer_event, 1000)
+
 def draw():
-    screen.clear()
-    bg.draw()
-    dog.draw()
-    for biscuit in biscuits:
-        biscuit.draw()
+    screen.blit(bg, (0, 0))
+    screen.blit(dog, dog_rect)
 
-    # draw heads up display:    
-    screen.draw.text(f"Score: {score}", topleft=(10, 10), fontsize=42)
-    screen.draw.text(f"Lives: {lives}", midtop=(WIDTH // 2, 10), fontsize=42)
-    screen.draw.text(f"Time: {timer}", topright=(WIDTH -10, 10), fontsize=42)
+    for biscuit_rect in biscuits:
+        screen.blit(biscuit_image, biscuit_rect)
 
-    if over == True:
-        screen.draw.text("Game Over!", center=(WIDTH // 2, HEIGHT // 2), fontsize=62)
+    # Draw heads up display
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    lives_text = font.render(f"Lives: {lives}", True, (255, 255, 255))
+    time_text = font.render(f"Time: {timer}", True, (255, 255, 255))
 
-# update function, which acts like game loop
+    screen.blit(score_text, (10, 10))
+    screen.blit(lives_text, (WIDTH // 2 - lives_text.get_width() // 2, 10))
+    screen.blit(time_text, (WIDTH - time_text.get_width() - 10, 10))
+
+    if over:
+        game_over_text = font_game_over.render("Game Over!", True, (255, 255, 255))
+        screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+
 def update():
-    global over 
-    global score # set variable global to access it within function
-    global lives # set variable global to access it within function
-    if keyboard.LEFT and dog.left > 0 :
-        dog.x -= velocity
-        dog.image = "bablo_left"
-    elif keyboard.RIGHT and dog.right < WIDTH:
-        dog.x += velocity
-        dog.image = "bablo_right"
-    if keyboard.UP and dog.top > 0:
-        dog.y -= velocity
-    elif keyboard.DOWN and dog.bottom < HEIGHT:
-        dog.y += velocity
-    for biscuit in biscuits:
-        biscuit.y += biscuit_velocity # make biscuits falling
-        if biscuit.top > HEIGHT: # if top of biscuit goes below the screen
-            biscuits.remove(biscuit) # remove it from list
-            if lives > 0: # and if there is lives remaining, reduce by one
+    global over, score, lives
+    keys = pygame.key.get_pressed()
+
+    # Define Bablos moving
+    if keys[K_LEFT] and dog_rect.left > 0:
+        dog_rect.x -= velocity
+        update_dog_image("left")
+    elif keys[K_RIGHT] and dog_rect.right < WIDTH:
+        dog_rect.x += velocity
+        update_dog_image("right")
+    if keys[K_UP] and dog_rect.top > 0:
+        dog_rect.y -= velocity
+    elif keys[K_DOWN] and dog_rect.bottom < HEIGHT:
+        dog_rect.y += velocity
+
+    # Define objects falling and collecting feature
+    for biscuit_rect in biscuits[:]:
+        biscuit_rect.y += biscuit_velocity
+        if biscuit_rect.top > HEIGHT:
+            biscuits.remove(biscuit_rect)
+            if lives > 0:
                 lives -= 1
-        if dog.colliderect(biscuit): # if player "hits" biscuit
-            biscuits.remove(biscuit) # remove biscuit from list (and screen)
+        if dog_rect.colliderect(biscuit_rect):
+            biscuits.remove(biscuit_rect)
             score += 1
-            sounds.bark.play()
-    if lives <= 0 and over == False: 
-        sounds.barktwice.play()
+            bark_sound.play()
+
+    if lives <= 0 and not over:
+        barktwice_sound.play()
         game_over()
-       
-# function which is called when key button released and sets forward facing image 
-def on_key_up(key):
-    if key == keys.LEFT or key == keys.RIGHT:
-        dog.image = "bablo_center"
 
-# define spawning function to spawn falling objects
+def update_dog_image(direction):
+    global dog
+    dog = dog_images[direction]
+
 def spawn_biscuit():
-    biscuit = Actor("biscuit")
-    biscuit.x = randint(20, WIDTH - 20)
-    biscuit.y = -20
-    biscuits.append(biscuit)
+    biscuit_rect = biscuit_image.get_rect(midtop=(randint(20, WIDTH - 20), -20))
+    biscuits.append(biscuit_rect)
 
-def start():
-    global timer
-    global score
-    global lives
-    global velocity
-    global biscuit_velocity
-    global over
-    over = False
-    timer = 0
-    lives = 5
-    biscuit_velocity = 6
-    velocity = 5
-    biscuits.clear()
-    dog.midbottom = (WIDTH // 2, HEIGHT)
-    clock.schedule_interval(increment_timer, 1.0)
-    clock.schedule_interval(spawn_biscuit, 0.5)
-    spawn_biscuit()
-    music.play("biscuithunt")
-    
-
-def game_over(): # called when lives are zero and game is over
+def game_over():
     global over
     over = True
-    clock.unschedule(increment_timer)
-    clock.unschedule(spawn_biscuit)
-    clock.schedule_unique(start, 5.0)
-    music.stop()
-    
-    
-def increment_timer():
-    global timer # set variable global to access it within function
-    timer += 1 
+    pygame.time.set_timer(biscuit_spawn_event, 0)
+    pygame.time.set_timer(timer_event, 0)
+    pygame.mixer.music.stop()
+    pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
 
-# clock.schedule_interval(increment_timer, 1.0)
-# clock.schedule_interval(spawn_biscuit, 0.5)
+def start():
+    global timer, score, lives, biscuit_velocity, velocity, over
+    over = False
+    timer = 0
+    score = 0
+    lives = 5
+    biscuit_velocity = 18
+    velocity = 17
+    biscuits.clear()
+    dog_rect.midbottom = (WIDTH // 2, HEIGHT)
+    pygame.time.set_timer(biscuit_spawn_event, 500)
+    pygame.time.set_timer(timer_event, 1000)
+    pygame.mixer.music.play(-1)  # Set music playing constanly
 
-start() # call start function which set everything to initial state
-pgzrun.go() # executes "game loop"
+# Game Loop
+start()
+running = True
+while running:
+    screen.fill((0, 0, 0))
+
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            running = False
+        elif event.type == KEYUP:
+            if event.key in (K_LEFT, K_RIGHT):
+                update_dog_image("center")
+        elif event.type == biscuit_spawn_event:
+            spawn_biscuit()
+        elif event.type == timer_event:
+            timer += 1
+        elif event.type == restart_event:
+            start()
+
+        # old restart codes, does not work
+        # elif event.type == pygame.USEREVENT + 3:  
+            #start()
+
+    update()
+    draw()
+
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()

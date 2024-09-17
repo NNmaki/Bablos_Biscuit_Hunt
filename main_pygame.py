@@ -1,3 +1,13 @@
+#
+#
+#
+# Bablos Biscuit Hunt - Small practice with Python
+# By Niko Nmaki 2024
+#
+# Inspired By @bablo_thedog - https://www.instagram.com/bablo_thedog/
+#
+#
+#
 
 import pygame
 from pygame.locals import *
@@ -5,7 +15,7 @@ from random import randint
 
 pygame.init()
 
-# Pelin muuttujat
+# Set variablers
 velocity = 17
 biscuits = []
 biscuit_velocity = 18
@@ -16,14 +26,14 @@ lives = 5
 over = False
 FPS = 60
 
-# Näytön koko
+# Set canvas and screen
 WIDTH = 580
 HEIGHT = 860
 TITLE = "Bablo's Biscuit Hunt"
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITLE)
 
-# Ladataan kuvat
+# Load images
 bg = pygame.image.load("images/background2.png")
 dog_images = {
     "center": pygame.image.load("images/bablo_center.png"),
@@ -35,20 +45,20 @@ dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 
 biscuit_image = pygame.image.load("images/biscuit50.png")
 
-# Äänet
+# Load sounds
 bark_sound = pygame.mixer.Sound("sounds/bark.wav")
 barktwice_sound = pygame.mixer.Sound("sounds/barktwice.wav")
 pygame.mixer.music.load("music/biscuithunt.mp3")
 
-# Fontti
+# Set fonts
 font = pygame.font.SysFont(None, 42)
 font_game_over = pygame.font.SysFont(None, 100)
 
-# Ajastimet
+# Set timers
 clock = pygame.time.Clock()
 biscuit_spawn_event = pygame.USEREVENT + 1
 timer_event = pygame.USEREVENT + 2
-restart_event = pygame.USEREVENT + 3 # new event for restarting game
+restart_event = pygame.USEREVENT + 3 # New event for restarting game
 pygame.time.set_timer(biscuit_spawn_event, 500)
 pygame.time.set_timer(timer_event, 1000)
 
@@ -59,7 +69,7 @@ def draw():
     for biscuit_rect in biscuits:
         screen.blit(biscuit_image, biscuit_rect)
 
-    # Piirrä tekstit
+    # Draw heads up display
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     lives_text = font.render(f"Lives: {lives}", True, (255, 255, 255))
     time_text = font.render(f"Time: {timer}", True, (255, 255, 255))
@@ -76,7 +86,7 @@ def update():
     global over, score, lives
     keys = pygame.key.get_pressed()
 
-    # Liikutetaan koiraa
+    # Define Bablos moving
     if keys[K_LEFT] and dog_rect.left > 0:
         dog_rect.x -= velocity
         update_dog_image("left")
@@ -88,7 +98,7 @@ def update():
     elif keys[K_DOWN] and dog_rect.bottom < HEIGHT:
         dog_rect.y += velocity
 
-    # Liikutetaan keksejä ja tarkistetaan törmäykset
+    # Define objects falling and collecting feature
     for biscuit_rect in biscuits[:]:
         biscuit_rect.y += biscuit_velocity
         if biscuit_rect.top > HEIGHT:
@@ -118,7 +128,7 @@ def game_over():
     pygame.time.set_timer(biscuit_spawn_event, 0)
     pygame.time.set_timer(timer_event, 0)
     pygame.mixer.music.stop()
-    pygame.time.set_timer(restart_event, 5000, True)  # Ajastetaan pelin uudelleenkäynnistys
+    pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
 
 def start():
     global timer, score, lives, biscuit_velocity, velocity, over
@@ -132,9 +142,9 @@ def start():
     dog_rect.midbottom = (WIDTH // 2, HEIGHT)
     pygame.time.set_timer(biscuit_spawn_event, 500)
     pygame.time.set_timer(timer_event, 1000)
-    pygame.mixer.music.play(-1)  # Toistetaan musiikkia loputtomasti
+    pygame.mixer.music.play(-1)  # Set music playing constanly
 
-# Pelin päälooppi
+# Game Loop
 start()
 running = True
 while running:
@@ -153,7 +163,7 @@ while running:
         elif event.type == restart_event:
             start()
 
-        # old restart codes, not working
+        # old restart codes, does not work
         # elif event.type == pygame.USEREVENT + 3:  
             #start()
 
