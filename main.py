@@ -13,6 +13,9 @@ import pygame
 from pygame.locals import *
 from random import randint
 
+import os
+import sys
+
 pygame.init()
 
 # Set variablers
@@ -33,22 +36,30 @@ TITLE = "Bablo's Biscuit Hunt"
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITLE)
 
+# Function to help pyinstaller to find paths
+def resource_path(relative_path):
+    try: # Pyinstaller to set sys._MEIPASS
+            base_path = sys._MEIPASS 
+    except AttributeError: # Or use current directory
+             base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # Load images
-bg = pygame.image.load("images/background2.png")
+bg = pygame.image.load(resource_path("images/background2.png"))
 dog_images = {
-    "center": pygame.image.load("images/bablo_center.png"),
-    "left": pygame.image.load("images/bablo_left.png"),
-    "right": pygame.image.load("images/bablo_right.png")
+    "center": pygame.image.load(resource_path("images/bablo_center.png")),
+    "left": pygame.image.load(resource_path("images/bablo_left.png")),
+    "right": pygame.image.load(resource_path("images/bablo_right.png"))
 }
 dog = dog_images["center"]
 dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 
-biscuit_image = pygame.image.load("images/biscuit50.png")
+biscuit_image = pygame.image.load(resource_path("images/biscuit50.png"))
 
 # Load sounds
-bark_sound = pygame.mixer.Sound("sounds/bark.wav")
-barktwice_sound = pygame.mixer.Sound("sounds/barktwice.wav")
-pygame.mixer.music.load("music/biscuithunt.mp3")
+bark_sound = pygame.mixer.Sound(resource_path("sounds/bark.wav"))
+barktwice_sound = pygame.mixer.Sound(resource_path("sounds/barktwice.wav"))
+pygame.mixer.music.load(resource_path("music/biscuithunt.mp3"))
 
 # Set fonts
 font = pygame.font.SysFont(None, 42)
