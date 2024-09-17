@@ -38,6 +38,7 @@ biscuit_velocity = 5
 timer = 0
 score = 0
 lives = 5
+over = False
 
 # set canvas size & title (pygame zero constants, not variables)
 WIDTH = 580
@@ -68,9 +69,12 @@ def draw():
     screen.draw.text(f"Lives: {lives}", midtop=(WIDTH // 2, 10), fontsize=42)
     screen.draw.text(f"Time: {timer}", topright=(WIDTH -10, 10), fontsize=42)
 
+    if over == True:
+        screen.draw.text("Game Over!", center=(WIDTH // 2, HEIGHT // 2), fontsize=62)
 
 # update function, which acts like game loop
 def update():
+    global over 
     global score # set variable global to access it within function
     global lives # set variable global to access it within function
     if keyboard.LEFT and dog.left > 0 :
@@ -87,14 +91,14 @@ def update():
         biscuit.y += biscuit_velocity # make biscuits falling
         if biscuit.top > HEIGHT: # if top of biscuit goes below the screen
             biscuits.remove(biscuit) # remove it from list
-            lives -= 1
-
+            if lives > 0: # and if there is lives remaining, reduce by one
+                lives -= 1
         if dog.colliderect(biscuit): # if player "hits" biscuit
             biscuits.remove(biscuit) # remove biscuit from list (and screen)
             score += 1
-    
-
-    
+    if lives <= 0 and over == False: 
+        game_over()
+       
 # function which is called when key button released and sets forward facing image 
 def on_key_up(key):
     if key == keys.LEFT or key == keys.RIGHT:
@@ -107,11 +111,38 @@ def spawn_biscuit():
     biscuit.y = -20
     biscuits.append(biscuit)
 
+def start():
+    global timer
+    global score
+    global lives
+    global velocity
+    global biscuit_velocity
+    global over
+    over = False
+    timer = 0
+    lives = 5
+    biscuit_velocity = 5
+    velocity = 5
+    biscuits.clear()
+    clock.schedule_interval(increment_timer, 1.0)
+    clock.schedule_interval(spawn_biscuit, 0.5)
+    spawn_biscuit()
+    music.play('biscuithunt')
+    
+
+def game_over(): # called when lives are zero and game is over
+    global over
+    over = True
+    clock.unschedule(increment_timer)
+    clock.unschedule(spawn_biscuit)
+    clock.schedule_unique(start, 5.0)
+    
 def increment_timer():
     global timer # set variable global to access it within function
     timer += 1 
 
-clock.schedule_interval(increment_timer, 1.0)
-clock.schedule_interval(spawn_biscuit, 0.5)
+# clock.schedule_interval(increment_timer, 1.0)
+# clock.schedule_interval(spawn_biscuit, 0.5)
 
+start() # call start function which set everything to initial state
 pgzrun.go() # executes "game loop"
