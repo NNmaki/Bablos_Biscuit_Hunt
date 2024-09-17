@@ -33,7 +33,7 @@ from random import randint
 
 velocity = 5
 biscuits = []
-biscuit_velocity = 5
+biscuit_velocity = 6
 
 timer = 0
 score = 0
@@ -96,7 +96,9 @@ def update():
         if dog.colliderect(biscuit): # if player "hits" biscuit
             biscuits.remove(biscuit) # remove biscuit from list (and screen)
             score += 1
+            sounds.bark.play()
     if lives <= 0 and over == False: 
+        sounds.barktwice.play()
         game_over()
        
 # function which is called when key button released and sets forward facing image 
@@ -121,13 +123,14 @@ def start():
     over = False
     timer = 0
     lives = 5
-    biscuit_velocity = 5
+    biscuit_velocity = 6
     velocity = 5
     biscuits.clear()
+    dog.midbottom = (WIDTH // 2, HEIGHT)
     clock.schedule_interval(increment_timer, 1.0)
     clock.schedule_interval(spawn_biscuit, 0.5)
     spawn_biscuit()
-    music.play('biscuithunt')
+    music.play("biscuithunt")
     
 
 def game_over(): # called when lives are zero and game is over
@@ -136,6 +139,8 @@ def game_over(): # called when lives are zero and game is over
     clock.unschedule(increment_timer)
     clock.unschedule(spawn_biscuit)
     clock.schedule_unique(start, 5.0)
+    music.stop()
+    
     
 def increment_timer():
     global timer # set variable global to access it within function
