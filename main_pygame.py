@@ -6,14 +6,15 @@ from random import randint
 pygame.init()
 
 # Pelin muuttujat
-velocity = 5
+velocity = 17
 biscuits = []
-biscuit_velocity = 6
+biscuit_velocity = 18
 
 timer = 0
 score = 0
 lives = 5
 over = False
+FPS = 60
 
 # Näytön koko
 WIDTH = 580
@@ -23,29 +24,31 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITLE)
 
 # Ladataan kuvat
-bg = pygame.image.load("background2.png")
+bg = pygame.image.load("images/background2.png")
 dog_images = {
-    "center": pygame.image.load("bablo_center.png"),
-    "left": pygame.image.load("bablo_left.png"),
-    "right": pygame.image.load("bablo_right.png")
+    "center": pygame.image.load("images/bablo_center.png"),
+    "left": pygame.image.load("images/bablo_left.png"),
+    "right": pygame.image.load("images/bablo_right.png")
 }
 dog = dog_images["center"]
 dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 
-biscuit_image = pygame.image.load("biscuit50.png")
+biscuit_image = pygame.image.load("images/biscuit50.png")
 
 # Äänet
-bark_sound = pygame.mixer.Sound("bark.wav")
-barktwice_sound = pygame.mixer.Sound("barktwice.wav")
-pygame.mixer.music.load("biscuithunt.mp3")
+bark_sound = pygame.mixer.Sound("sounds/bark.wav")
+barktwice_sound = pygame.mixer.Sound("sounds/barktwice.wav")
+pygame.mixer.music.load("music/biscuithunt.mp3")
 
 # Fontti
 font = pygame.font.SysFont(None, 42)
+font_game_over = pygame.font.SysFont(None, 100)
 
 # Ajastimet
 clock = pygame.time.Clock()
 biscuit_spawn_event = pygame.USEREVENT + 1
 timer_event = pygame.USEREVENT + 2
+restart_event = pygame.USEREVENT + 3 # new event for restarting game
 pygame.time.set_timer(biscuit_spawn_event, 500)
 pygame.time.set_timer(timer_event, 1000)
 
@@ -66,7 +69,7 @@ def draw():
     screen.blit(time_text, (WIDTH - time_text.get_width() - 10, 10))
 
     if over:
-        game_over_text = font.render("Game Over!", True, (255, 0, 0))
+        game_over_text = font_game_over.render("Game Over!", True, (255, 255, 255))
         screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
 
 def update():
@@ -115,7 +118,7 @@ def game_over():
     pygame.time.set_timer(biscuit_spawn_event, 0)
     pygame.time.set_timer(timer_event, 0)
     pygame.mixer.music.stop()
-    pygame.time.set_timer(pygame.USEREVENT + 3, 5000)  # Ajastetaan pelin uudelleenkäynnistys
+    pygame.time.set_timer(restart_event, 5000, True)  # Ajastetaan pelin uudelleenkäynnistys
 
 def start():
     global timer, score, lives, biscuit_velocity, velocity, over
@@ -123,8 +126,8 @@ def start():
     timer = 0
     score = 0
     lives = 5
-    biscuit_velocity = 6
-    velocity = 5
+    biscuit_velocity = 18
+    velocity = 17
     biscuits.clear()
     dog_rect.midbottom = (WIDTH // 2, HEIGHT)
     pygame.time.set_timer(biscuit_spawn_event, 500)
@@ -147,13 +150,17 @@ while running:
             spawn_biscuit()
         elif event.type == timer_event:
             timer += 1
-        elif event.type == pygame.USEREVENT + 3:  # Uudelleenkäynnistys 5 sekunnin jälkeen
+        elif event.type == restart_event:
             start()
+
+        # old restart codes, not working
+        # elif event.type == pygame.USEREVENT + 3:  
+            #start()
 
     update()
     draw()
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(FPS)
 
 pygame.quit()
