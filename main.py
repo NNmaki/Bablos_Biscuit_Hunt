@@ -1,18 +1,12 @@
 #
-#
-#
 # Bablos Biscuit Hunt - Small practice with Python
 # By Niko Nmaki 2024
 #
 # Inspired By @bablo_thedog - https://www.instagram.com/bablo_thedog/
 #
-#
-#
-
 import pygame
 from pygame.locals import *
 from random import randint
-
 import os
 import sys
 
@@ -26,12 +20,18 @@ carrots = []
 carrot_velocity = 4
 olives = []
 olive_velocity = 4
+sausages = []
+sausage_velocity = 2
 
 timer = 0
 score = 0
 lives = 5
 over = False
 FPS = 60
+
+# Uusi muuttuja menu-tilan ja instrions sivun hallintaan
+in_menu = True
+instructions = False
 
 # Set canvas and screen
 WIDTH = 580
@@ -50,6 +50,13 @@ def resource_path(relative_path):
 
 # Load images
 bg = pygame.image.load(resource_path("images/background2.png"))
+menu_bg = pygame.image.load(resource_path("images/menu_backround.png"))
+
+button_play = pygame.image.load(resource_path("images/button_play.png"))
+button_instructions = pygame.image.load(resource_path("images/button_instructions.png"))
+button_quit = pygame.image.load(resource_path("images/button_quit.png"))
+
+instructions_image = pygame.image.load(resource_path("images/instructions.png"))
 dog_images = {
     "center": pygame.image.load(resource_path("images/bablo_center.png")),
     "left": pygame.image.load(resource_path("images/bablo_left.png")),
@@ -61,6 +68,7 @@ dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 biscuit_image = pygame.image.load(resource_path("images/biscuit50.png"))
 carrot_image = pygame.image.load(resource_path("images/carrot50.png"))
 olive_image = pygame.image.load(resource_path("images/olive50.png"))
+sausage_image = pygame.image.load(resource_path("images/sausage50.png"))
 
 
 # Load sounds
@@ -79,9 +87,11 @@ timer_event = pygame.USEREVENT + 2
 restart_event = pygame.USEREVENT + 3 # New event for restarting game
 carrot_spawn_event = pygame.USEREVENT + 4
 olive_spawn_event = pygame.USEREVENT +5
+sausage_spawn_event = pygame.USEREVENT +6
 pygame.time.set_timer(biscuit_spawn_event, 500)
 pygame.time.set_timer(carrot_spawn_event, 2000)
 pygame.time.set_timer(olive_spawn_event, 2000)
+pygame.time.set_timer(sausage_spawn_event, 6000)
 pygame.time.set_timer(timer_event, 1000)
 
 def draw():
@@ -97,6 +107,9 @@ def draw():
     for olive_rect in olives:
         screen.blit(olive_image, olive_rect)
 
+    for sausage_rect in sausages:
+        screen.blit(sausage_image, sausage_rect)
+
     # Draw heads up display
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     lives_text = font.render(f"Lives: {lives}", True, (255, 255, 255))
@@ -109,6 +122,34 @@ def draw():
     if over:
         game_over_text = font_game_over.render("Game Over!", True, (255, 255, 255))
         screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+
+# Define function to draw start menu
+def draw_menu():
+    screen.blit(menu_bg, (0,0))
+    button_rect = button_play.get_rect(center=(WIDTH // 2, HEIGHT // 2 -50))
+    screen.blit(button_play, button_rect)
+    
+    button_rect2 = button_instructions.get_rect(center=(WIDTH // 2 -150, HEIGHT // 2 +90))
+    screen.blit(button_instructions, button_rect2)
+
+    button_rect3 = button_quit.get_rect(center=(WIDTH // 2 +150, HEIGHT // 2 +90))
+    screen.blit(button_quit, button_rect3)
+
+    # screen.blit(instructions_text, (button_rect2.centerx - instructions_text.get_width() // 2, button_rect2.centery - instructions_text.get_height() // 2))
+    # screen.blit(start_text, (button_rect.centerx - start_text.get_width() // 2, button_rect.centery - start_text.get_height() // 2))
+    # start_text = font.render("Press SPACE to Start", True, (255, 255, 255))
+    # instructions_text = font.render("Press I -key for instructions", True, (255, 255, 255))
+    # title_text_line1 = font_game_over.render("Bablo's", True, (255, 255, 255))
+    # title_text_line2 = font_game_over.render("Biscuit Hunt", True, (255, 255, 255))
+    # screen.blit(instruction_text, (button_rect.centerx - instruction_text.get_width() // 2, button_rect.centery - instruction_text.get_height() // 2))
+    # screen.blit(title_text_line1, (WIDTH // 2 - title_text_line1.get_width() // 2, HEIGHT // 4))
+    # screen.blit(title_text_line2, (WIDTH // 2 - title_text_line2.get_width() // 2, HEIGHT // 3))
+    # screen.blit(instruction_text, (WIDTH // 2 - instruction_text.get_width() // 2, HEIGHT // 2))
+    # screen.fill((126, 155, 64))  # Backround color light green
+
+def instructions_menu():
+    instructions_rect = instructions_image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(instructions_image, instructions_rect)
 
 def update():
     global over, score, lives
@@ -154,7 +195,15 @@ def update():
             score -= 2
             olives.remove(olive_rect)
 
-
+    for sausage_rect in sausages[:]:
+        sausage_rect.y += sausage_velocity
+        if sausage_rect.top > HEIGHT:
+            sausages.remove(sausage_rect)
+        if dog_rect.colliderect(sausage_rect):
+            lives = 0
+            sausages.remove(sausage_rect)
+            game_over()
+            
     if lives <= 0 and not over:
         barktwice_sound.play()
         game_over()
@@ -175,18 +224,30 @@ def spawn_olive():
     olive_rect = olive_image.get_rect(midtop=(randint(20, WIDTH -20), -20))
     olives.append(olive_rect)
 
+def spawn_sausage():
+    sausage_rect = sausage_image.get_rect(midtop=(randint(20, WIDTH -20), -20))
+    sausages.append(sausage_rect)
+
+
+
 def game_over():
-    global over
+    global over, in_menu
     over = True
     pygame.time.set_timer(biscuit_spawn_event, 0)
     pygame.time.set_timer(carrot_spawn_event, 0)
     pygame.time.set_timer(olive_spawn_event, 0)
+    pygame.time.set_timer(sausage_spawn_event, 0)
     pygame.time.set_timer(timer_event, 0)
     pygame.mixer.music.stop()
-    pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
+    pygame.time.set_timer(restart_event, 5000, True)
+
+    # Attemps to make start menu working
+    # pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
+    # pygame.time.set_timer(in_menu, 5000, True) 
+    # in_menu = True
 
 def start():
-    global timer, score, lives, biscuit_velocity, carrot_velocity, olive_velocity, velocity, over
+    global timer, score, lives, biscuit_velocity, carrot_velocity, olive_velocity, sausage_velocity, velocity, over
     over = False
     timer = 0
     score = 0
@@ -194,14 +255,17 @@ def start():
     biscuit_velocity = 3
     carrot_velocity = 4
     olive_velocity = 4
+    sausage_velocity = 2
     velocity = 8
     biscuits.clear()
     carrots.clear()
     olives.clear()
+    sausages.clear()
     dog_rect.midbottom = (WIDTH // 2, HEIGHT)
     pygame.time.set_timer(biscuit_spawn_event, 500)
     pygame.time.set_timer(carrot_spawn_event, 2000)
     pygame.time.set_timer(olive_spawn_event, 2000)
+    pygame.time.set_timer(sausage_spawn_event, 6000)
     pygame.time.set_timer(timer_event, 1000)
     pygame.mixer.music.play(-1)  # Set music playing constanly
 
@@ -215,25 +279,38 @@ while running:
         if event.type == QUIT:
             running = False
         elif event.type == KEYUP:
-            if event.key in (K_LEFT, K_RIGHT):
+            if event.key == K_SPACE and in_menu:
+                start()
+                in_menu = False
+            elif event.key in (K_LEFT, K_RIGHT):
                 update_dog_image("center")
+            if event.key == K_i and in_menu:
+                instructions = True
+            if event.key == K_q and in_menu:
+                running = False
         elif event.type == biscuit_spawn_event:
             spawn_biscuit()
         elif event.type == carrot_spawn_event:
             spawn_carrot()
         elif event.type == olive_spawn_event:
             spawn_olive()
+        elif event.type == sausage_spawn_event:
+            spawn_sausage()
         elif event.type == timer_event:
             timer += 1
         elif event.type == restart_event:
-            start()
+            in_menu = True # Back to menu-screen
+           
 
-        # old restart codes, does not work
-        # elif event.type == pygame.USEREVENT + 3:  
-            #start()
+    if in_menu:
+        draw_menu()  # Näytä valikkonäyttö
+        if instructions:
+            instructions_menu() # Näytä instructions
 
-    update()
-    draw()
+
+    else:
+        update()  # Päivitä pelin tilaa
+        draw()  # Piirrä pelin elementit
 
     pygame.display.flip()
     clock.tick(FPS)
