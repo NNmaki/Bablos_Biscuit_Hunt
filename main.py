@@ -19,9 +19,13 @@ import sys
 pygame.init()
 
 # Set variablers
-velocity = 17
+velocity = 8
 biscuits = []
-biscuit_velocity = 18
+biscuit_velocity = 3
+carrots = []
+carrot_velocity = 4
+olives = []
+olive_velocity = 4
 
 timer = 0
 score = 0
@@ -55,6 +59,9 @@ dog = dog_images["center"]
 dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
 
 biscuit_image = pygame.image.load(resource_path("images/biscuit50.png"))
+carrot_image = pygame.image.load(resource_path("images/carrot50.png"))
+olive_image = pygame.image.load(resource_path("images/olive50.png"))
+
 
 # Load sounds
 bark_sound = pygame.mixer.Sound(resource_path("sounds/bark.wav"))
@@ -70,7 +77,11 @@ clock = pygame.time.Clock()
 biscuit_spawn_event = pygame.USEREVENT + 1
 timer_event = pygame.USEREVENT + 2
 restart_event = pygame.USEREVENT + 3 # New event for restarting game
+carrot_spawn_event = pygame.USEREVENT + 4
+olive_spawn_event = pygame.USEREVENT +5
 pygame.time.set_timer(biscuit_spawn_event, 500)
+pygame.time.set_timer(carrot_spawn_event, 2000)
+pygame.time.set_timer(olive_spawn_event, 2000)
 pygame.time.set_timer(timer_event, 1000)
 
 def draw():
@@ -79,6 +90,12 @@ def draw():
 
     for biscuit_rect in biscuits:
         screen.blit(biscuit_image, biscuit_rect)
+
+    for carrot_rect in carrots:
+        screen.blit(carrot_image, carrot_rect)
+
+    for olive_rect in olives:
+        screen.blit(olive_image, olive_rect)
 
     # Draw heads up display
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
@@ -121,6 +138,23 @@ def update():
             score += 1
             bark_sound.play()
 
+    for carrot_rect in carrots[:]:
+        carrot_rect.y += carrot_velocity
+        if carrot_rect.top > HEIGHT:
+            carrots.remove(carrot_rect)
+        if dog_rect.colliderect(carrot_rect):
+            score -= 1
+            carrots.remove(carrot_rect)
+
+    for olive_rect in olives[:]:
+        olive_rect.y += olive_velocity
+        if olive_rect.top > HEIGHT:
+            olives.remove(olive_rect)
+        if dog_rect.colliderect(olive_rect):
+            score -= 2
+            olives.remove(olive_rect)
+
+
     if lives <= 0 and not over:
         barktwice_sound.play()
         game_over()
@@ -133,25 +167,41 @@ def spawn_biscuit():
     biscuit_rect = biscuit_image.get_rect(midtop=(randint(20, WIDTH - 20), -20))
     biscuits.append(biscuit_rect)
 
+def spawn_carrot():
+    carrot_rect = carrot_image.get_rect(midtop=(randint(20, WIDTH -20), -20))
+    carrots.append(carrot_rect)
+
+def spawn_olive():
+    olive_rect = olive_image.get_rect(midtop=(randint(20, WIDTH -20), -20))
+    olives.append(olive_rect)
+
 def game_over():
     global over
     over = True
     pygame.time.set_timer(biscuit_spawn_event, 0)
+    pygame.time.set_timer(carrot_spawn_event, 0)
+    pygame.time.set_timer(olive_spawn_event, 0)
     pygame.time.set_timer(timer_event, 0)
     pygame.mixer.music.stop()
     pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
 
 def start():
-    global timer, score, lives, biscuit_velocity, velocity, over
+    global timer, score, lives, biscuit_velocity, carrot_velocity, olive_velocity, velocity, over
     over = False
     timer = 0
     score = 0
     lives = 5
-    biscuit_velocity = 18
-    velocity = 17
+    biscuit_velocity = 3
+    carrot_velocity = 4
+    olive_velocity = 4
+    velocity = 8
     biscuits.clear()
+    carrots.clear()
+    olives.clear()
     dog_rect.midbottom = (WIDTH // 2, HEIGHT)
     pygame.time.set_timer(biscuit_spawn_event, 500)
+    pygame.time.set_timer(carrot_spawn_event, 2000)
+    pygame.time.set_timer(olive_spawn_event, 2000)
     pygame.time.set_timer(timer_event, 1000)
     pygame.mixer.music.play(-1)  # Set music playing constanly
 
@@ -169,6 +219,10 @@ while running:
                 update_dog_image("center")
         elif event.type == biscuit_spawn_event:
             spawn_biscuit()
+        elif event.type == carrot_spawn_event:
+            spawn_carrot()
+        elif event.type == olive_spawn_event:
+            spawn_olive()
         elif event.type == timer_event:
             timer += 1
         elif event.type == restart_event:
