@@ -71,12 +71,16 @@ sausage_image = pygame.image.load(resource_path("images/sausage50.png"))
 # Load sounds
 bark_sound = pygame.mixer.Sound(resource_path("sounds/bark.wav"))
 barktwice_sound = pygame.mixer.Sound(resource_path("sounds/barktwice.wav"))
+lost_sound = pygame.mixer.Sound(resource_path("sounds/lost.wav"))
+wrong_sound = pygame.mixer.Sound(resource_path("sounds/wrong.wav"))
+gameover_sound = pygame.mixer.Sound(resource_path("sounds/gameover.wav"))
 pygame.mixer.music.load(resource_path("music/biscuithunt.mp3"))
 pygame.mixer.music.load(resource_path("music/menumusic.mp3"))
 
 # Set fonts
 font = pygame.font.SysFont(None, 42)
-font_game_over = pygame.font.SysFont(None, 100)
+font_game_over = pygame.font.SysFont(None, 90)
+font_game_over_score = pygame.font.SysFont(None, 70)
 
 # Set timers
 clock = pygame.time.Clock()
@@ -116,6 +120,9 @@ def draw():
     if over:
         game_over_text = font_game_over.render("Game Over!", True, (255, 255, 255))
         screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2))
+        game_over_score_text = font_game_over_score.render(f"Your score: {score}", True, (255, 255, 255))
+        screen.blit(game_over_score_text, (WIDTH // 2 - game_over_score_text.get_width() // 2, HEIGHT // 2 + 100))
+
 
 # Define function to draw start menu
 def draw_menu():
@@ -137,6 +144,9 @@ def update():
     global over, score, lives
     keys = pygame.key.get_pressed()
 
+    if over:
+        return
+
     # Define Bablos moving
     if keys[K_LEFT] and dog_rect.left > 0:
         dog_rect.x -= velocity
@@ -156,6 +166,7 @@ def update():
             biscuits.remove(biscuit_rect)
             if lives > 0:
                 lives -= 1
+                lost_sound.play()
         if dog_rect.colliderect(biscuit_rect):
             biscuits.remove(biscuit_rect)
             score += 1
@@ -167,6 +178,7 @@ def update():
             carrots.remove(carrot_rect)
         if dog_rect.colliderect(carrot_rect):
             score -= 1
+            wrong_sound.play()
             carrots.remove(carrot_rect)
 
     for olive_rect in olives[:]:
@@ -175,6 +187,7 @@ def update():
             olives.remove(olive_rect)
         if dog_rect.colliderect(olive_rect):
             score -= 2
+            wrong_sound.play()
             olives.remove(olive_rect)
 
     for sausage_rect in sausages[:]:
@@ -183,12 +196,12 @@ def update():
             sausages.remove(sausage_rect)
         if dog_rect.colliderect(sausage_rect):
             lives = 0
+            wrong_sound.play()
             sausages.remove(sausage_rect)
             game_over()
             
     if lives <= 0 and not over:
-        barktwice_sound.play()
-        game_over()
+            game_over()
 
 def update_dog_image(direction):
     global dog
@@ -213,6 +226,7 @@ def spawn_sausage():
 def game_over():
     global over, in_menu
     over = True
+    gameover_sound.play()
     pygame.time.set_timer(biscuit_spawn_event, 0)
     pygame.time.set_timer(carrot_spawn_event, 0)
     pygame.time.set_timer(olive_spawn_event, 0)
@@ -301,7 +315,7 @@ while running:
         if not game_music_playing:
             pygame.mixer.music.load(resource_path("music/biscuithunt.mp3"))
             pygame.mixer.music.play(-1)
-            music_playing = True
+            game_music_playing = True
             menu_music_playing = False
 
     pygame.display.flip()
