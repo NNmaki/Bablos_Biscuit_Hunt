@@ -15,7 +15,7 @@ import sys
 pygame.init()
 
 # Set variables
-velocity = 8
+velocity = 6
 biscuits = []
 biscuit_velocity = 3
 carrots = []
@@ -245,7 +245,7 @@ def start():
     carrot_velocity = 4
     olive_velocity = 4
     sausage_velocity = 2
-    velocity = 8
+    velocity = 6
     biscuits.clear()
     carrots.clear()
     olives.clear()
