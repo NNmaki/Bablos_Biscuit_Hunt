@@ -2,6 +2,8 @@
 # Bablos Biscuit Hunt - Small practice with Python
 # By Niko Nmaki 2024
 #
+# https://github.com/NNmaki/Bablos_Biscuit_Hunt
+#
 # Inspired By @bablo_thedog - https://www.instagram.com/bablo_thedog/
 #
 import pygame
@@ -12,7 +14,7 @@ import sys
 
 pygame.init()
 
-# Set variablers
+# Set variables
 velocity = 8
 biscuits = []
 biscuit_velocity = 3
@@ -29,7 +31,6 @@ lives = 5
 over = False
 FPS = 60
 
-# Uusi muuttuja menu-tilan ja instrions sivun hallintaan
 in_menu = True
 instructions = False
 
@@ -51,11 +52,9 @@ def resource_path(relative_path):
 # Load images
 bg = pygame.image.load(resource_path("images/background2.png"))
 menu_bg = pygame.image.load(resource_path("images/menu_backround.png"))
-
 button_play = pygame.image.load(resource_path("images/button_play.png"))
 button_instructions = pygame.image.load(resource_path("images/button_instructions.png"))
 button_quit = pygame.image.load(resource_path("images/button_quit.png"))
-
 instructions_image = pygame.image.load(resource_path("images/instructions.png"))
 dog_images = {
     "center": pygame.image.load(resource_path("images/bablo_center.png")),
@@ -64,17 +63,16 @@ dog_images = {
 }
 dog = dog_images["center"]
 dog_rect = dog.get_rect(midbottom=(WIDTH // 2, HEIGHT))
-
 biscuit_image = pygame.image.load(resource_path("images/biscuit50.png"))
 carrot_image = pygame.image.load(resource_path("images/carrot50.png"))
 olive_image = pygame.image.load(resource_path("images/olive50.png"))
 sausage_image = pygame.image.load(resource_path("images/sausage50.png"))
 
-
 # Load sounds
 bark_sound = pygame.mixer.Sound(resource_path("sounds/bark.wav"))
 barktwice_sound = pygame.mixer.Sound(resource_path("sounds/barktwice.wav"))
 pygame.mixer.music.load(resource_path("music/biscuithunt.mp3"))
+pygame.mixer.music.load(resource_path("music/menumusic.mp3"))
 
 # Set fonts
 font = pygame.font.SysFont(None, 42)
@@ -97,16 +95,12 @@ pygame.time.set_timer(timer_event, 1000)
 def draw():
     screen.blit(bg, (0, 0))
     screen.blit(dog, dog_rect)
-
     for biscuit_rect in biscuits:
         screen.blit(biscuit_image, biscuit_rect)
-
     for carrot_rect in carrots:
         screen.blit(carrot_image, carrot_rect)
-
     for olive_rect in olives:
         screen.blit(olive_image, olive_rect)
-
     for sausage_rect in sausages:
         screen.blit(sausage_image, sausage_rect)
 
@@ -134,18 +128,6 @@ def draw_menu():
 
     button_rect3 = button_quit.get_rect(center=(WIDTH // 2 +150, HEIGHT // 2 +90))
     screen.blit(button_quit, button_rect3)
-
-    # screen.blit(instructions_text, (button_rect2.centerx - instructions_text.get_width() // 2, button_rect2.centery - instructions_text.get_height() // 2))
-    # screen.blit(start_text, (button_rect.centerx - start_text.get_width() // 2, button_rect.centery - start_text.get_height() // 2))
-    # start_text = font.render("Press SPACE to Start", True, (255, 255, 255))
-    # instructions_text = font.render("Press I -key for instructions", True, (255, 255, 255))
-    # title_text_line1 = font_game_over.render("Bablo's", True, (255, 255, 255))
-    # title_text_line2 = font_game_over.render("Biscuit Hunt", True, (255, 255, 255))
-    # screen.blit(instruction_text, (button_rect.centerx - instruction_text.get_width() // 2, button_rect.centery - instruction_text.get_height() // 2))
-    # screen.blit(title_text_line1, (WIDTH // 2 - title_text_line1.get_width() // 2, HEIGHT // 4))
-    # screen.blit(title_text_line2, (WIDTH // 2 - title_text_line2.get_width() // 2, HEIGHT // 3))
-    # screen.blit(instruction_text, (WIDTH // 2 - instruction_text.get_width() // 2, HEIGHT // 2))
-    # screen.fill((126, 155, 64))  # Backround color light green
 
 def instructions_menu():
     instructions_rect = instructions_image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
@@ -228,8 +210,6 @@ def spawn_sausage():
     sausage_rect = sausage_image.get_rect(midtop=(randint(20, WIDTH -20), -20))
     sausages.append(sausage_rect)
 
-
-
 def game_over():
     global over, in_menu
     over = True
@@ -240,11 +220,6 @@ def game_over():
     pygame.time.set_timer(timer_event, 0)
     pygame.mixer.music.stop()
     pygame.time.set_timer(restart_event, 5000, True)
-
-    # Attemps to make start menu working
-    # pygame.time.set_timer(restart_event, 5000, True)  # New method for restarting game
-    # pygame.time.set_timer(in_menu, 5000, True) 
-    # in_menu = True
 
 def start():
     global timer, score, lives, biscuit_velocity, carrot_velocity, olive_velocity, sausage_velocity, velocity, over
@@ -267,14 +242,18 @@ def start():
     pygame.time.set_timer(olive_spawn_event, 2000)
     pygame.time.set_timer(sausage_spawn_event, 6000)
     pygame.time.set_timer(timer_event, 1000)
-    pygame.mixer.music.play(-1)  # Set music playing constanly
+    barktwice_sound.play()
+    # barktwice_sound.play(loops=1)
+    # pygame.mixer.music.play(-1)  # Set music playing constanly
 
 # Game Loop
 start()
 running = True
+game_music_playing = False # States if game music is playing
+menu_music_playing = False # States if game music is playing
+
 while running:
     screen.fill((0, 0, 0))
-
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -305,16 +284,25 @@ while running:
         elif event.type == restart_event:
             in_menu = True # Back to menu-screen
            
-
-    if in_menu:
-        draw_menu()  # Näytä valikkonäyttö
-        if instructions:
-            instructions_menu() # Näytä instructions
-
+    if in_menu: # Show menu if in_menu = True
+        draw_menu()
+        if instructions: # Show instructions both of these = True
+            instructions_menu()
+        
+        if not menu_music_playing:
+            pygame.mixer.music.load(resource_path("music/menumusic.mp3"))
+            pygame.mixer.music.play(-1)
+            game_music_playing = False
+            menu_music_playing = True
 
     else:
-        update()  # Päivitä pelin tilaa
-        draw()  # Piirrä pelin elementit
+        update()
+        draw()
+        if not game_music_playing:
+            pygame.mixer.music.load(resource_path("music/biscuithunt.mp3"))
+            pygame.mixer.music.play(-1)
+            music_playing = True
+            menu_music_playing = False
 
     pygame.display.flip()
     clock.tick(FPS)
