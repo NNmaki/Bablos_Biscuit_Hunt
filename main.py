@@ -286,6 +286,10 @@ while running:
                 update_dog_image("center")
             if event.key == K_i and in_menu:
                 instructions = True
+            if event.key == K_ESCAPE and in_menu:
+                instructions = False
+            if event.key == K_ESCAPE and running:
+                in_menu = True
             if event.key == K_q and in_menu:
                 running = False
         elif event.type == biscuit_spawn_event:
