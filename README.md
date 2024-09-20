@@ -64,6 +64,12 @@ Collect biscuits and avoid letting them to fall out. Avoid carrots, olives and p
 
 You can download standalone executables for Windows or Linux from following links:
 
+![button_windows](https://github.com/user-attachments/assets/d1e94ed1-febd-4bc4-8c3a-7a8132537076)![button_linux](https://github.com/user-attachments/assets/2aef97d0-aa76-4b3d-9035-2bccaa005c90)
+
+
+
+
+
 When downloaded, extract zip-file, open folder and execute/double click main.exe and enjoy the game!
 
 --
