@@ -64,7 +64,8 @@ Collect biscuits and avoid letting them to fall out. Avoid carrots, olives and p
 
 You can download standalone executables for Windows or Linux from following links:
 
-<a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_windows.zip" target="_blank">![button_windows](https://github.com/user-attachments/assets/63a34989-7ba4-4456-8772-d7f587cfeca4)!</a><a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_biscuit_hunt_linux_ubuntu_debian_v1.1.zip" target="_blank">![button_linux](https://github.com/user-attachments/assets/2d4f5846-e6d4-4f83-bbf4-3da47da1aca0)!</a>
+<a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_windows.zip" target="_blank">![button_windows](https://github.com/user-attachments/assets/63a34989-7ba4-4456-8772-d7f587cfeca4)!</a>![button_linux](https://github.com/user-attachments/assets/7703b34b-3f84-4148-bca2-b0829e0d588f)
+
 
 
 
