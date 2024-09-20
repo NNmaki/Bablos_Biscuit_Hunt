@@ -60,6 +60,16 @@ Collect biscuits and avoid letting them to fall out. Avoid carrots, olives and p
 
 ![instructions_github](https://github.com/user-attachments/assets/f41d131b-7be3-46e6-a592-54013f78f2e6)
 
+## 🔥 Install
+
+You can download standalone executables for Windows or Linux from following links:
+
+When downloaded, extract zip-file, open folder and execute/double click main.exe and enjoy the game!
+
+--
+
+If you want to run the game directly with Python, you can use the command <code>git clone https://github.com/NNmaki/Bablos_Biscuit_Hunt.git</code> and then execute the command <code>Python3 main.py</code> Make sure you have <code>Python3</code> and <code>Pygame</code> already installed
+
 
 
 
