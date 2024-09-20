@@ -28,7 +28,17 @@ The game was initially developed using the PyGame Zero -library, which is a begi
 
 ![screenshots_2](https://github.com/user-attachments/assets/a2015185-9429-41ae-9d1c-afc073c61468)
 
+## 🔥 Install
 
+You can download standalone executables for Windows or Linux from following links:
+
+<a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_windows.zip" target="_blank">![button_windows](https://github.com/user-attachments/assets/63a34989-7ba4-4456-8772-d7f587cfeca4)!</a><a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_debian_ubuntu.zip" target="_blank">![button_linux](https://github.com/user-attachments/assets/7703b34b-3f84-4148-bca2-b0829e0d588f)</a>
+
+When downloaded, extract zip-file, open folder and execute/double click main.exe and enjoy the game!
+
+--
+
+If you want to run the game directly with Python, you can use the command <code>git clone https://github.com/NNmaki/Bablos_Biscuit_Hunt.git</code> and then execute the command <code>Python3 main.py</code> Make sure you have <code>Python3</code> and <code>Pygame</code> already installed
 
 ## 🔧 Tech talk
 
@@ -60,24 +70,7 @@ Collect biscuits and avoid letting them to fall out. Avoid carrots, olives and p
 
 ![instructions_github](https://github.com/user-attachments/assets/f41d131b-7be3-46e6-a592-54013f78f2e6)
 
-## 🔥 Install
 
-You can download standalone executables for Windows or Linux from following links:
-
-<a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_windows.zip" target="_blank">![button_windows](https://github.com/user-attachments/assets/63a34989-7ba4-4456-8772-d7f587cfeca4)!</a><a href="https://github.com/NNmaki/Bablos_Biscuit_Hunt/raw/refs/heads/master/bablos_game_v1.1_debian_ubuntu.zip" target="_blank">![button_linux](https://github.com/user-attachments/assets/7703b34b-3f84-4148-bca2-b0829e0d588f)</a>
-
-
-
-
-
-
-
-
-When downloaded, extract zip-file, open folder and execute/double click main.exe and enjoy the game!
-
---
-
-If you want to run the game directly with Python, you can use the command <code>git clone https://github.com/NNmaki/Bablos_Biscuit_Hunt.git</code> and then execute the command <code>Python3 main.py</code> Make sure you have <code>Python3</code> and <code>Pygame</code> already installed
 
 
 
