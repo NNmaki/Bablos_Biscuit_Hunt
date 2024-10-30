@@ -9,7 +9,8 @@
   <img src="https://github.com/pygame/pygame/blob/main/docs/reST/_static/pygame_logo.svg">
   </p>
 
-### Update 30.10.2024
+
+## 👉 Update 30.10.2024
 Hey, now there is also Java Script version which can be played online, check more: https://github.com/NNmaki/Bablos_Biscuit_Hunt_js
 
 
